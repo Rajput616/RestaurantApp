@@ -4,27 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dish Ordering</title>
-
-    <!-- Link to Google Fonts (Roboto) -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* Global Styles */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f7fc;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
             margin: 0;
             padding: 0;
             color: #333;
         }
+       h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    /* Gradient text */
+    background: linear-gradient(90deg, #ff6a00, #ee0979, #00f260, #0575e6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    text-transform: uppercase; /* optional */
+}
 
-        h1 {
+        .form-container {
             text-align: center;
-            color: #4CAF50;
-            margin-top: 20px;
-            font-size: 2.5rem;
+            margin: 20px;
         }
-
+       input {
+    padding: 10px 15px;       /* Medium size */
+    border-radius: 10px;      /* Rounded corners */
+    border: 1px solid #ccc;   /* Light border */
+    font-size: 1rem;          /* Medium text */
+    outline: none;            /* Remove default focus outline */
+    transition: all 0.3s ease;
+}
         ul {
             padding: 0;
             list-style-type: none;
@@ -33,7 +48,6 @@
             align-items: center;
             gap: 20px;
         }
-
         li {
             background-color: #fff;
             padding: 15px 20px;
@@ -44,70 +58,54 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        li:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        span {
-            font-size: 1.2rem;
-            color: #555;
-        }
-
         .order-btn {
             background-color: #4CAF50;
             color: white;
             padding: 8px 15px;
             border: none;
+            font-size: 20px;
             border-radius: 4px;
-            font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            text-decoration: none;
         }
-
-        .order-btn:hover {
-            background-color: #45a049;
-        }
-
-        .order-count {
-            margin-left: 10px;
-            background-color: #e8f5e9;
-            color: #388e3c;
-            border-radius: 4px;
-            padding: 2px 10px;
-        }
-
-        /* Responsive Styling */
-        @media (max-width: 768px) {
-            ul {
-                width: 100%;
-                padding: 10px;
-            }
-
-            li {
-                width: 90%;
-                padding: 12px 15px;
-            }
-        }
+        .edit-btn { background-color: #2196F3; }
+        .delete-btn { background-color: #f44336; }
     </style>
 </head>
 <body>
 
 <h1>Most Ordered Dish Today</h1>
 
-<!-- List of Dishes -->
+<!-- Add/Edit Dish Form -->
+<div class="form-container">
+    <form th:action="${dish != null and dish.id != null} ? @{/update/{id}(id=${dish.id})} : @{/add}"
+          th:object="${dish}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <input type="text" th:field="*{name}" placeholder="Dish Name" required />
+        <input type="number" th:field="*{price}" placeholder="Price" required step="0.01" />
+        <button type="submit" class="order-btn">Save</button>
+    </form>
+</div>
+
+<!-- Dish List -->
 <ul>
     <li th:each="dish : ${dishes}">
         <div>
-            <span th:text="${dish.name}"></span> -
-            <span class="order-count" th:text="${dish.orderCount} + ' orders'"></span>
+            <span th:text="${dish.name}"></span> - Rs.
+            <span th:text="${dish.price}"></span> |
+            <span th:text="${dish.orderCount} + ' orders'"></span>
         </div>
-        <form th:action="@{'/order/' + ${dish.id}}" method="post">
-            <button type="submit" class="order-btn">Order</button>
-        </form>
+        <div>
+            <!-- Order -->
+            <form th:action="@{/order/{id}(id=${dish.id})}" method="post" style="display:inline;">
+                <button type="submit" class="order-btn">Order</button>
+            </form>
+            <!-- Edit -->
+            <a th:href="@{/edit/{id}(id=${dish.id})}" class="order-btn edit-btn">Edit</a>
+            <!-- Delete -->
+            <a th:href="@{/delete/{id}(id=${dish.id})}" class="order-btn delete-btn">Delete</a>
+        </div>
     </li>
 </ul>
 
